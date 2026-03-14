@@ -51,6 +51,9 @@ try {
 const PORT = process.env.PORT || 3000;
 const SYSLOG_PORT = parseInt(process.env.SYSLOG_PORT || '5514', 10);
 const DEMO_MODE = process.env.DEMO_MODE !== 'false';
+const SERVER_LAT = parseFloat(process.env.SERVER_LAT || '46.740661');
+const SERVER_LON = parseFloat(process.env.SERVER_LON || '8.980018');
+const SERVER_LOCATION_LABEL = process.env.SERVER_LOCATION_LABEL || 'SOC-ALPHA-01';
 
 // Geo-block detection: match by rule number OR by rule UUID (label field).
 // Set GEO_BLOCK_RULES=76,77 and/or GEO_BLOCK_UUIDS=uuid1,uuid2 in .env.
@@ -68,6 +71,17 @@ console.log(`[Config] Geo-block rules: numbers=[${[...GEO_BLOCK_RULE_NUMBERS]}] 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// REST endpoint: Public config (hub coordinates, location label)
+app.get('/api/config', (req, res) => {
+    res.json({
+        hub: {
+            lat: SERVER_LAT,
+            lon: SERVER_LON,
+            label: SERVER_LOCATION_LABEL,
+        },
+    });
+});
 
 // REST endpoint: Emergency Lockdown
 app.post('/api/lockdown', async (req, res) => {

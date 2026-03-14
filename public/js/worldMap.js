@@ -11,9 +11,17 @@
  *   • All attack arcs, heatmap, hub and rate-ring preserved
  */
 
-// ── Hub location: SOC-ALPHA-01 (Schweiz) ──
-const HUB_LAT = 46.740661;
-const HUB_LON = 8.980018;
+// ── Hub location: loaded from /api/config (set via SERVER_LAT / SERVER_LON in .env) ──
+let HUB_LAT = 46.740661; // fallback default
+let HUB_LON = 8.980018;  // fallback default
+let HUB_LABEL = 'SOC-ALPHA-01';
+
+/** Update hub coordinates (called after /api/config is fetched) */
+export function setHubLocation(lat, lon, label) {
+    HUB_LAT = lat;
+    HUB_LON = lon;
+    if (label) HUB_LABEL = label;
+}
 
 // Max concurrent arcs / dots before oldest are pruned
 const MAX_ARCS = 40;

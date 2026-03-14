@@ -5,7 +5,7 @@
  */
 
 import { CyberSOCClient } from './wsClient.js';
-import { initMap, renderAttack, setAttackRate } from './worldMap.js';
+import { initMap, renderAttack, setAttackRate, setHubLocation } from './worldMap.js';
 import { initTerminal, logAttack, logSystem } from './logTerminal.js';
 import { initPortsChart, recordPortHit } from './portsChart.js';
 import { recordAttack, updateIntegrity, updateInterfaces } from './statsUpdater.js';
@@ -17,6 +17,26 @@ let client = null;
 // ── Bootstrap ──────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('[CyberSOC] Initializing…');
+
+    // 0. Load server config (hub coordinates etc.)
+    try {
+        const cfg = await fetch('/api/config').then(r => r.json());
+        if (cfg?.hub) {
+            const { lat, lon, label } = cfg.hub;
+            setHubLocation(lat, lon, label);
+            // Update footer coordinates display
+            const coordEl = document.getElementById('footer-coord');
+            if (coordEl) {
+                const latStr = `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? 'N' : 'S'}`;
+                const lonStr = `${Math.abs(lon).toFixed(4)}° ${lon >= 0 ? 'E' : 'W'}`;
+                coordEl.textContent = `Coord: ${latStr}, ${lonStr}`;
+            }
+            const stationEl = document.getElementById('footer-station');
+            if (stationEl) stationEl.textContent = `Station: ${label}`;
+        }
+    } catch (err) {
+        console.warn('[App] Could not load /api/config:', err.message);
+    }
 
     // Init UI modules
     initTerminal('terminal-body');

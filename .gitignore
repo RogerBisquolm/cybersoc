@@ -3,3 +3,4 @@ data/
 .env
 *.mmdb
 *.tar.gz
+.DS_Store

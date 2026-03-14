@@ -4,3 +4,4 @@ data/
 *.mmdb
 *.tar.gz
 .DS_Store
+helpme.txt

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberSOC Alpha — Global Intelligence Dashboard</title>
+  <meta name="description"
+    content="Real-time cyber attack intelligence dashboard powered by OPNsense firewall logs, geoIP, and WebRTC data streaming." />
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    rel="stylesheet" />
+
+  <!-- D3.js + TopoJSON -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════ -->
+  <header id="main-header">
+    <div class="header-left">
+      <div class="logo-icon">
+        <span class="material-symbols-outlined">shield_with_heart</span>
+      </div>
+      <h1 class="logo-text">CyberSOC <span class="accent">Alpha</span></h1>
+      <div class="status-pill" id="status-pill">
+        <div class="pulse-dot"></div>
+        <span id="status-label">Connecting…</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-metrics">
+        <div class="metric-row">
+          <span class="metric-label">UPTIME</span>
+          <span class="metric-value" id="hdr-uptime">99.98%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">LATENCY</span>
+          <span class="metric-value cyan" id="hdr-latency">—</span>
+        </div>
+      </div>
+      <div class="header-icons">
+        <button class="icon-btn" title="Notifications" id="notif-btn" aria-label="Notifications">
+          <span class="material-symbols-outlined">notifications</span>
+          <span class="notif-badge" id="notif-badge" style="display:none">!</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+     MAIN LAYOUT
+══════════════════════════════════════════ -->
+  <main id="main-layout">
+
+    <!-- ── LEFT SIDEBAR ── -->
+    <aside class="sidebar-left glass">
+
+
+      <!-- Top Threat Sources -->
+      <div class="panel-section">
+        <h3 class="panel-heading">Top Threat Sources</h3>
+        <div class="threat-sources" id="threat-sources">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Targeted Ports Donut -->
+      <div class="panel-section">
+        <h3 class="panel-heading">Targeted Ports</h3>
+        <div class="donut-wrapper">
+          <canvas id="ports-chart" width="160" height="160"></canvas>
+          <div class="donut-center">
+            <span class="donut-label">TOTAL</span>
+            <span class="donut-value" id="port-total">0</span>
+          </div>
+        </div>
+        <div class="donut-legend" id="donut-legend">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Integrity Stats -->
+      <div class="panel-section">
+        <h3 class="panel-heading">Integrity Stats</h3>
+        <div class="integrity-grid">
+          <div class="integrity-card">
+            <span class="integrity-label">Firewall</span>
+            <div class="integrity-ring ring-green" id="ring-firewall">
+              <span class="ring-value">—</span>
+            </div>
+          </div>
+          <div class="integrity-card">
+            <span class="integrity-label">Network</span>
+            <div class="integrity-ring ring-cyan" id="ring-network">
+              <span class="ring-value">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ── CENTER MAP ── -->
+    <section class="map-section">
+
+      <!-- Map Overlay Stats -->
+      <div class="map-overlay-top">
+        <div class="glass overlay-card">
+          <div class="overlay-metric">
+            <span class="overlay-label">Events / min</span>
+            <span class="overlay-value" id="active-nodes">—</span>
+          </div>
+          <div class="overlay-divider"></div>
+          <div class="overlay-metric">
+            <span class="overlay-label">Block Rate</span>
+            <span class="overlay-value cyan" id="peak-load">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- D3 World Map -->
+      <div class="map-container" id="map-container">
+        <svg id="world-map"></svg>
+      </div>
+
+      <!-- Live Log Terminal -->
+      <div class="terminal glass" id="terminal-panel">
+        <div class="terminal-header">
+          <span class="material-symbols-outlined">terminal</span>
+          <span class="terminal-title">Live Security Log</span>
+          <span class="terminal-subtitle">Auto-updating</span>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+          <div class="log-entry log-info">
+            <span class="log-ts">[--:--:--]</span>
+            <span class="log-lvl">INFO</span>
+            <span class="log-msg">Waiting for CyberSOC server connection…</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RIGHT SIDEBAR ── -->
+    <aside class="sidebar-right glass">
+
+      <!-- Total Attacks Counter -->
+      <div class="stat-card">
+        <p class="stat-label">Total Attacks Blocked</p>
+        <p class="stat-value" id="total-blocked">0</p>
+        <div class="stat-delta">
+          <span class="delta-pct cyan" id="delta-pct">+0.0%</span>
+          <span class="delta-label">vs last 24h</span>
+        </div>
+      </div>
+
+      <!-- Network Interfaces -->
+      <div class="panel-section">
+        <h3 class="panel-heading">Network Interfaces</h3>
+        <div class="interfaces-list" id="interfaces-panel">
+          <p class="no-iface">Waiting for traffic…</p>
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+  <footer id="main-footer">
+    <div class="footer-left">
+      <span>Station: SOC-ALPHA-01</span>
+      <span>Coord: 46.7407° N, 8.9800° E</span>
+    </div>
+    <div class="footer-right">
+      <span class="encrypted-label">● ENCRYPTED CONNECTION</span>
+      <span id="footer-timestamp">—</span>
+    </div>
+  </footer>
+
+  <!-- Lockdown Overlay -->
+  <div class="lockdown-overlay" id="lockdown-overlay" style="display:none">
+    <div class="lockdown-modal">
+      <span class="material-symbols-outlined lockdown-icon">lock</span>
+      <h2>EMERGENCY LOCKDOWN</h2>
+      <p>All WAN traffic is currently BLOCKED</p>
+      <button class="release-btn" id="release-btn">Release Lockdown</button>
+    </div>
+  </div>
+
+  <!-- Main Application Script -->
+  <script type="module" src="js/app.js?v=10"></script>
+</body>
+
+</html>

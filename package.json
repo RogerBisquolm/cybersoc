@@ -1,0 +1,28 @@
+{
+  "name": "cybersoc",
+  "version": "1.0.0",
+  "description": "CyberSOC Alpha — Real-Time Cyber Attack Map Dashboard",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "DEMO_MODE=true node server.js",
+    "update-geoip": "node scripts/updateGeoDb.js"
+  },
+  "keywords": [
+    "cybersecurity",
+    "soc",
+    "dashboard",
+    "opnsense",
+    "webrtc"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^4.18.2",
+    "geoip-lite": "^1.4.10",
+    "maxmind": "^5.0.5",
+    "ws": "^8.16.0"
+  }
+}

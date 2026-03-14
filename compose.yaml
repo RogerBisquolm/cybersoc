@@ -1,0 +1,28 @@
+services:
+  cybersoc:
+    image: cybersoc-alpha:latest
+    container_name: cybersoc-alpha
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /opt/stacks/cybersoc/data:/app/data
+    environment:
+      PORT: ${PORT:-}
+      SYSLOG_PORT: ${SYSLOG_PORT:-}
+      DEMO_MODE: ${DEMO_MODE:-}
+      DEBUG_SYSLOG: ${DEBUG_SYSLOG:-}
+      NODE_ENV: production
+      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:-}
+      GEO_BLOCK_RULES: ${GEO_BLOCK_RULES:-}
+      GEO_BLOCK_UUIDS: ${GEO_BLOCK_UUIDS:-}
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -qO-
+        - https://attackmap.pentanet-lab.ch/api/lockdown
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+networks: {}

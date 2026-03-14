@@ -1,0 +1,46 @@
+services:
+  cybersoc:
+    build: .
+    container_name: cybersoc-alpha
+    restart: unless-stopped
+    network_mode: host
+
+    volumes:
+      # MaxMind GeoLite2-City.mmdb — auto-updated by integrated crond (every Tuesday 06:00 UTC).
+      # Set MAXMIND_LICENSE_KEY in .env to enable automatic downloads.
+      - /opt/stacks/cybersoc/data:/app/data
+
+    environment:
+      PORT: 5021
+      SYSLOG_PORT: 5514
+      DEMO_MODE: "false" # true = show demo data alongside real OPNsense events
+      DEBUG_SYSLOG: "true" # Remove after confirming real events appear on the map
+      NODE_ENV: production
+
+      # MaxMind GeoLite2 — used by docker-entrypoint.sh on startup and weekly crond
+      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:-}
+
+      # OPNsense Emergency Lockdown API (optional)
+      OPNSENSE_HOST: ${OPNSENSE_HOST:-}
+      OPNSENSE_API_KEY: ${OPNSENSE_API_KEY:-}
+      OPNSENSE_API_SECRET: ${OPNSENSE_API_SECRET:-}
+      OPNSENSE_REAL_MODE: ${OPNSENSE_REAL_MODE:-false}
+
+      # Geo-Block Rule Detection
+      # Rule numbers from OPNsense filterlog (first CSV field, e.g. "76,,,uuid,...")
+      GEO_BLOCK_RULES: "76,77,64"
+      # UUID label of geo-block rule (field 3 in filterlog CSV)
+      GEO_BLOCK_UUIDS: "b0f57181e39d7cb375f45a5a1fc08909"
+
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:5021/api/lockdown" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -32,6 +32,11 @@ services:
       # UUID label of geo-block rule (field 3 in filterlog CSV)
       GEO_BLOCK_UUIDS: "b0f57181e39d7cb375f45a5a1fc08909"
 
+      # SOC Hub Location (shown on map and footer)
+      SERVER_LAT: ${SERVER_LAT:-46.740661}
+      SERVER_LON: ${SERVER_LON:-8.980018}
+      SERVER_LOCATION_LABEL: ${SERVER_LOCATION_LABEL:-SOC-ALPHA-01}
+
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:5021/api/lockdown" ]
       interval: 15s

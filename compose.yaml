@@ -20,7 +20,7 @@ services:
         - CMD
         - wget
         - -qO-
-        - https://attackmap.pentanet-lab.ch/api/lockdown
+        - https://localhost:5021/api/lockdown
       interval: 15s
       timeout: 5s
       retries: 3

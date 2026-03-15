@@ -38,7 +38,7 @@ services:
       SERVER_LOCATION_LABEL: ${SERVER_LOCATION_LABEL:-SOC-ALPHA-01}
 
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://localhost:5021/api/lockdown" ]
+      test: [ "CMD", "wget", "-qO-", "${HEALTHCHECK_URL:-http://localhost:5021/api/lockdown}" ]
       interval: 15s
       timeout: 5s
       retries: 3

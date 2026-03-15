@@ -88,6 +88,10 @@ OPNSENSE_REAL_MODE=true
 | `PORT`                | `3000`      | HTTP server port                       |
 | `SYSLOG_PORT`         | `5514`      | UDP syslog listener port               |
 | `DEMO_MODE`           | `true`      | Enable attack simulator (no OPNsense)  |
+| `HEALTHCHECK_URL`     | `http://localhost:5021/api/lockdown` | URL used by Docker healthcheck (`wget`) |
+| `SERVER_LAT`          | `46.740661` | Latitude of SOC server (shown on map)  |
+| `SERVER_LON`          | `8.980018`  | Longitude of SOC server (shown on map) |
+| `SERVER_LOCATION_LABEL` | `SOC-ALPHA-01` | Label shown on map and footer    |
 | `OPNSENSE_HOST`       | —           | OPNsense base URL                      |
 | `OPNSENSE_API_KEY`    | —           | OPNsense API key                       |
 | `OPNSENSE_API_SECRET` | —           | OPNsense API secret                    |

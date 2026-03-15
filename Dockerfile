@@ -58,6 +58,6 @@ ENV PORT=3000 \
   NODE_ENV=production
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget -qO- http://localhost:${PORT:-3000}/api/lockdown || exit 1
+  CMD wget -qO- ${HEALTHCHECK_URL:-http://localhost:5021/api/lockdown} || exit 1
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

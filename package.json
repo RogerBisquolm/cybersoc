@@ -19,10 +19,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^17.3.1",
-    "express": "^4.18.2",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2",
     "geoip-lite": "^1.4.10",
-    "maxmind": "^5.0.5",
-    "ws": "^8.16.0"
+    "maxmind": "^5.0.6",
+    "ws": "^8.21.0"
   }
 }
